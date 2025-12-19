@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VR Numerical Aperture Tool</title>
+
+  <!-- A-Frame for WebVR/WebXR -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    #panel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 260px;
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    input, button {
+      width: 100%;
+      margin-top: 8px;
+      padding: 6px;
+    }
+
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #004c99;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Control Panel -->
+  <div id="panel">
+    <h3>Numerical Aperture</h3>
+
+    <label>Refractive Index (n)</label>
+    <input type="number" id="n" value="1.0" step="0.01">
+
+    <label>Light Cone Half Angle θ (degrees)</label>
+    <input type="number" id="theta" value="30">
+
+    <button onclick="calculateNA()">Calculate NA</button>
+
+    <p id="output">NA = 0.500</p>
+  </div>
+
+  <!-- VR Scene -->
+  <a-scene>
+
+    <!-- Camera -->
+    <a-entity camera look-controls position="0 1.6 3"></a-entity>
+
+    <!-- Light Cone Representation -->
+    <a-cone
+      id="cone"
+      position="0 1 -3"
+      radius-bottom="0.577"
+      radius-top="0"
+      height="2"
+      color="#00c8ff"
+      opacity="0.6">
+    </a-cone>
+
+    <!-- Axis reference -->
+    <a-cylinder position="0 1 -3" radius="0.02" height="2" color="black"></a-cylinder>
+
+    <a-sky color="#ECECEC"></a-sky>
+
+  </a-scene>
+
+  <script>
+    function calculateNA() {
+      const n = parseFloat(document.getElementById("n").value);
+      const thetaDeg = parseFloat(document.getElementById("theta").value);
+
+      const thetaRad = thetaDeg * Math.PI / 180;
+      const NA = n * Math.sin(thetaRad);
+
+      document.getElementById("output").innerHTML =
+        "NA = <b>" + NA.toFixed(3) + "</b>";
+
+      // Update cone geometry based on angle
+      const coneRadius = Math.tan(thetaRad);
+      const cone = document.getElementById("cone");
+      cone.setAttribute("radius-bottom", coneRadius);
+    }
+  </script>
+
+</body>
+</html>
